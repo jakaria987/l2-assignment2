@@ -59,6 +59,13 @@ const userSchema = new Schema<TUser, UserModel, UserMethods>({
   orders: [ordersSchema],
 });
 
+userSchema.set('toJSON', {
+  transform: function (_doc, ret) {
+    delete ret.password;
+    return ret;
+  },
+});
+
 // pre save middleware
 userSchema.pre('save', async function (next) {
   // console.log(this, 'pre hook');
