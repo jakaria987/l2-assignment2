@@ -1,18 +1,40 @@
 import { Request, Response } from 'express';
 import { UserServices } from './user.service';
+import JoiValidationSchema from './user.joiValidation';
 
 const createUser = async (req: Request, res: Response) => {
   try {
     const { user: userData } = req.body;
-    const result = await UserServices.createUserIntoDB(userData);
+    const { error, value } = JoiValidationSchema.validate(userData);
+    const result = await UserServices.createUserIntoDB(value);
+    if (error) {
+      res.status(500).json({
+        success: false,
+        message: 'something went wrong',
+        error: error.details,
+      });
+    }
 
     res.status(200).json({
       success: true,
       message: 'User created successfully!',
       data: result,
     });
-  } catch (err) {
-    console.log(err);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'something went wrong',
+      error: err,
+    });
+    // res.status(500).json({
+    //   success: false,
+    //   message: 'User not found',
+    //   error: {
+    //     code: 404,
+    //     description: 'User not found!',
+    //   },
+    // });
   }
 };
 const getAllUsers = async (req: Request, res: Response) => {
@@ -24,8 +46,13 @@ const getAllUsers = async (req: Request, res: Response) => {
       message: 'Users fetched successfully!',
       data: result,
     });
-  } catch (err) {
-    console.log(err);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: err.message || 'something went wrong',
+      error: err,
+    });
   }
 };
 
