@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-this-alias */
 import { Schema, model } from 'mongoose';
 import {
   TAddress,
@@ -7,6 +8,8 @@ import {
   UserMethods,
   UserModel,
 } from './user.interface';
+import bcrypt from 'bcrypt';
+import config from '../../config';
 
 const fullNameSchema = new Schema<TFullName>({
   firstName: {
@@ -55,6 +58,22 @@ const userSchema = new Schema<TUser, UserModel, UserMethods>({
   address: addressSchema,
   orders: [ordersSchema],
 });
+
+// pre save middleware
+userSchema.pre('save', async function (next) {
+  // console.log(this, 'pre hook');
+  const user = this;
+
+  user.password = await bcrypt.hash(
+    user.password,
+    Number(config.bcrypt_salt_rounds),
+  );
+  next();
+});
+userSchema.post('save', function () {
+  console.log(this, 'post hook');
+});
+
 userSchema.methods.isUserExists = async function (userId: number) {
   const existingUser = await User.findOne({ userId });
   return existingUser;
