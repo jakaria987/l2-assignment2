@@ -53,18 +53,19 @@ const userSchema = new Schema<TUser, UserModel, UserMethods>({
     //   message: '{VALUE} is not a valid email type',
     // },
   },
-  isActive: { type: Boolean },
+  isActive: { type: Boolean, default: true },
   hobbies: [{ type: String }],
   address: addressSchema,
   orders: [ordersSchema],
+  isDeleted: { type: Boolean, default: false },
 });
 
-userSchema.set('toJSON', {
-  transform: function (_doc, ret) {
-    delete ret.password;
-    return ret;
-  },
-});
+// userSchema.set('toJSON', {
+//   transform: function (_doc, ret) {
+//     delete ret.password;
+//     return ret;
+//   },
+// });
 
 // pre save middleware
 userSchema.pre('save', async function (next) {
@@ -77,8 +78,25 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
-userSchema.post('save', function () {
-  console.log(this, 'post hook');
+userSchema.post('save', function (doc, next) {
+  doc.password = '';
+  next();
+});
+
+// query middleware
+userSchema.pre('find', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+
+  next();
+});
+userSchema.pre('findOne', function (next) {
+  this.find({ isDeleted: { $ne: true } });
+
+  next();
+});
+userSchema.pre('aggregate', function (next) {
+  this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+  next();
 });
 
 userSchema.methods.isUserExists = async function (userId: number) {

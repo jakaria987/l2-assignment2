@@ -78,6 +78,28 @@ const getSingleUser = async (req: Request, res: Response) => {
     });
   }
 };
+const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    const result = await UserServices.deleteUserFromDB(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'User deleted successfully!',
+      data: result,
+    });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  } catch (err: any) {
+    res.status(500).json({
+      success: false,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
+    });
+  }
+};
 const updateSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
@@ -94,8 +116,11 @@ const updateSingleUser = async (req: Request, res: Response) => {
   } catch (err: any) {
     res.status(500).json({
       success: false,
-      message: err.message || 'Something went wrong',
-      error: err,
+      message: 'User not found',
+      error: {
+        code: 404,
+        description: 'User not found!',
+      },
     });
   }
 };
@@ -105,4 +130,5 @@ export const UserControllers = {
   getAllUsers,
   getSingleUser,
   updateSingleUser,
+  deleteUser,
 };
