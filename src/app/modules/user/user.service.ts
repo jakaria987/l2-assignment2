@@ -16,8 +16,17 @@ const getSingleUserFromDB = async (userId: string) => {
   return result;
 };
 
+const updateUserFromDB = async (
+  userId: string,
+  updateFields: Partial<User>,
+) => {
+  const result = await UserModel.updateOne({ userId }, { $set: updateFields });
+  return result;
+};
+
 export const UserServices = {
   createUserIntoDB,
   getAllUsersFromDB,
   getSingleUserFromDB,
+  updateUserFromDB,
 };
