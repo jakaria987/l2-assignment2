@@ -103,7 +103,7 @@ const deleteUser = async (req: Request, res: Response) => {
 const updateSingleUser = async (req: Request, res: Response) => {
   try {
     const { userId } = req.params;
-    const updateData = req.body; // Assuming the update data is in the request body
+    const updateData = req.body;
 
     const result = await UserServices.updateUserFromDB(userId, updateData);
 

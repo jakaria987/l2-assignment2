@@ -14,17 +14,9 @@ import config from '../../config';
 const fullNameSchema = new Schema<TFullName>({
   firstName: {
     type: String,
-    // validate: {
-    //   validator: (value: string) => validator.isAlpha(value),
-    //   message: '{VALUE} is not valid',
-    // },
   },
   lastName: {
     type: String,
-    // validate: {
-    //   validator: (value: string) => validator.isAlpha(value),
-    //   message: '{VALUE} is not valid',
-    // },
   },
 });
 
@@ -48,10 +40,6 @@ const userSchema = new Schema<TUser, UserModel, UserMethods>({
   age: { type: Number },
   email: {
     type: String,
-    // validate: {
-    //   validator: (value: string) => validator.isAlpha(value),
-    //   message: '{VALUE} is not a valid email type',
-    // },
   },
   isActive: { type: Boolean, default: true },
   hobbies: [{ type: String }],
@@ -60,12 +48,12 @@ const userSchema = new Schema<TUser, UserModel, UserMethods>({
   isDeleted: { type: Boolean, default: false },
 });
 
-// userSchema.set('toJSON', {
-//   transform: function (_doc, ret) {
-//     delete ret.password;
-//     return ret;
-//   },
-// });
+userSchema.set('toJSON', {
+  transform: function (_doc, ret) {
+    delete ret.password;
+    return ret;
+  },
+});
 
 // pre save middleware
 userSchema.pre('save', async function (next) {
@@ -78,10 +66,10 @@ userSchema.pre('save', async function (next) {
   );
   next();
 });
-userSchema.post('save', function (doc, next) {
-  doc.password = '';
-  next();
-});
+// userSchema.post('save', function (doc, next) {
+//   doc.password = '';
+//   next();
+// });
 
 // query middleware
 userSchema.pre('find', function (next) {
